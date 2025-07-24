@@ -45,6 +45,7 @@ jobs:
           ./run.sh export crypto-ecosystems-bundle.jsonl
           
           if [ -f "crypto-ecosystems-bundle.jsonl" ]; then
+            rm -rf export || true
             mkdir -p export
             split -b 50M crypto-ecosystems-bundle.jsonl chunk_
             
