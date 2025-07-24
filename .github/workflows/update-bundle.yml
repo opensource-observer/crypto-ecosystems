@@ -47,7 +47,7 @@ jobs:
           if [ -f "crypto-ecosystems-bundle.jsonl" ]; then
             rm -rf export || true
             mkdir -p export
-            split -b 50M crypto-ecosystems-bundle.jsonl chunk_
+            split -C 50M crypto-ecosystems-bundle.jsonl chunk_
             
             for chunk in chunk_*; do
               uuid=$(uuidgen | tr '[:upper:]' '[:lower:]')
