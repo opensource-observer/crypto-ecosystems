@@ -1,0 +1,57 @@
+name: Update Bundle
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-bundle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote rm upstream || true
+          git remote add upstream https://github.com/electric-capital/crypto-ecosystems.git
+
+      - name: Pull upstream changes
+        run: git pull upstream master --rebase --ff
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.14.0
+
+      - name: Build
+        run: ./run.sh build
+
+      - name: Export bundle
+        run: |
+          ./run.sh export crypto-ecosystems-bundle.jsonl
+          git lfs track "crypto-ecosystems-bundle.jsonl"
+
+      - name: Add and commit changes
+        run: |
+          git add .gitattributes crypto-ecosystems-bundle.jsonl
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update crypto-ecosystems-bundle.jsonl"
+            git push origin HEAD
+          fi
