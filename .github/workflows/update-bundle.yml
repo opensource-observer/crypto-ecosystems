@@ -63,6 +63,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "bot: update `crypto-ecosystems` bundle chunks"
+            git commit -m "bot: update crypto-ecosystems bundle chunks"
+            git pull --rebase origin HEAD || true
             git push origin HEAD
           fi
