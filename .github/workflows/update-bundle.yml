@@ -50,8 +50,8 @@ jobs:
             split -C 50M crypto-ecosystems-bundle.jsonl chunk_
             
             for chunk in chunk_*; do
-              uuid=$(uuidgen | tr '[:upper:]' '[:lower:]')
-              mv "$chunk" "export/${uuid}.jsonl"
+              hash=$(sha256sum "$chunk" | cut -d' ' -f1 | head -c 16)
+              mv "$chunk" "export/${hash}.jsonl"
             done
             
             rm crypto-ecosystems-bundle.jsonl
@@ -64,6 +64,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "bot: update crypto-ecosystems bundle chunks"
-            git pull --rebase origin HEAD || true
-            git push origin HEAD
+            git push origin HEAD --force-with-lease
           fi
